@@ -1,14 +1,17 @@
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
       numberOne: null,
       numberTwo: null,
       operation: "",
-      result: null,
       isOptionInvalid: false,
       isOperationCalculated: false,
+      operationSymbol: "",
       numberRule: (value) => /^\d+$/.test(value) || "Only numbers are allowed",
+      result: null,
     };
   },
   methods: {
@@ -22,16 +25,36 @@ export default {
       } else {
         this.isOptionInvalid = false;
         if (this.operation === "Sum") {
-          this.result = parseFloat(this.numberOne) + parseFloat(this.numberTwo);
+          this.operationSymbol = "+";
         } else if (this.operation === "Subtraction") {
-          this.result = this.numberOne - this.numberTwo;
+          this.operationSymbol = "-";
         } else if (this.operation === "Multiplication") {
-          this.result = this.numberOne * this.numberTwo;
+          this.operationSymbol = "*";
         } else {
-          this.result = this.numberOne / this.numberTwo;
+          this.operationSymbol = "/";
         }
-        this.isOperationCalculated = true;
       }
+
+      console.log("Debug");
+
+      const numbers = {
+        num1: this.numberOne,
+        num2: this.numberTwo,
+        operation: this.operationSymbol,
+      };
+
+      console.log(numbers);
+
+      axios
+        .post(
+          "https://calculator-express.onrender.com/calculator/calc",
+          numbers
+        )
+        .then((response) => {
+          this.result = response.data.result;
+          this.isOperationCalculated = true;
+        })
+        .catch((error) => console.log(error));
     },
   },
 };
